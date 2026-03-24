@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Stats — SENTRX-Q{% endblock %}
+
+{% block content %}
+<h1>Statistics</h1>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <h3>Total Triaged</h3>
+    <div class="value">{{ stats.get('total', 0) }}</div>
+  </div>
+  {% for sev in ['critical', 'high', 'medium', 'low'] %}
+  <div class="stat-card">
+    <h3>{{ sev | capitalize }}</h3>
+    <div class="value" style="color: var(--{{ sev }});">
+      {{ stats.get('by_severity', {}).get(sev, 0) }}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<h1 style="margin-top:1.5rem;">By Category</h1>
+<table>
+  <thead>
+    <tr><th>Category</th><th>Count</th></tr>
+  </thead>
+  <tbody>
+    {% for cat, count in (stats.get('by_category', {}) | dictsort(by='value', reverse=true)) %}
+    <tr><td>{{ cat | replace('_', ' ') }}</td><td>{{ count }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h1 style="margin-top:1.5rem;">Actions Taken</h1>
+<table>
+  <thead>
+    <tr><th>Action</th><th>Count</th></tr>
+  </thead>
+  <tbody>
+    {% for act, count in (stats.get('by_action', {}) | dictsort(by='value', reverse=true)) %}
+    <tr><td>{{ act }}</td><td>{{ count }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

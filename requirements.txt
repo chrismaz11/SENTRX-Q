@@ -1,0 +1,12 @@
+praw>=7.7.0
+openai>=1.0.0
+flask>=3.0.0
+sqlalchemy>=2.0.0
+pyyaml>=6.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# Dev / test
+pytest>=8.0.0
+pytest-cov>=5.0.0
+flake8>=7.0.0

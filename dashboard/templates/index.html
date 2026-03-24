@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Queue — SENTRX-Q{% endblock %}
+
+{% block content %}
+<h1>Mod Queue — r/sentrx_q_dev</h1>
+
+{% if not items %}
+  <p class="empty">No items in the queue.</p>
+{% else %}
+<table>
+  <thead>
+    <tr>
+      <th>Severity</th>
+      <th>Category</th>
+      <th>Author</th>
+      <th>Title / Body</th>
+      <th>Reports</th>
+      <th>Confidence</th>
+      <th>Source</th>
+      <th>Suggested Action</th>
+      <th>Quick Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+    <tr>
+      <td><span class="badge badge-{{ item.severity }}">{{ item.severity }}</span></td>
+      <td>{{ item.category | replace('_', ' ') }}</td>
+      <td>
+        <a href="https://reddit.com/u/{{ item.author }}" target="_blank" rel="noopener">
+          u/{{ item.author }}
+        </a>
+      </td>
+      <td style="max-width:320px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
+          title="{{ item.title or item.removal_reason }}">
+        {% if item.title %}{{ item.title }}{% else %}<em>{{ item.explanation[:80] }}</em>{% endif %}
+      </td>
+      <td>{{ item.num_reports or 0 }}</td>
+      <td>
+        <span class="confidence-bar">
+          <span style="width:{{ (item.confidence * 100) | int }}%"></span>
+        </span>
+        {{ "%.0f"|format(item.confidence * 100) }}%
+      </td>
+      <td><span class="badge badge-{{ item.source }}">{{ item.source }}</span></td>
+      <td>{{ item.action }}</td>
+      <td>
+        <form method="POST" action="/action" style="display:inline;">
+          <input type="hidden" name="item_id" value="{{ item.item_id }}">
+          <button class="btn btn-approve" name="action" value="approve">✓</button>
+          <button class="btn btn-remove" name="action" value="remove">✕</button>
+          <button class="btn btn-escalate" name="action" value="escalate">⚑</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}
