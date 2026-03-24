@@ -1,0 +1,1 @@
+"""SENTRX-Q Flask dashboard."""

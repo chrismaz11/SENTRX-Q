@@ -1,0 +1,55 @@
+# SENTRX-Q default configuration
+# All auto-action features are disabled by default for safety.
+
+reddit:
+  # Reddit API credentials — override via environment variables or a .env file.
+  client_id: "${REDDIT_CLIENT_ID}"
+  client_secret: "${REDDIT_CLIENT_SECRET}"
+  username: "${REDDIT_USERNAME}"
+  password: "${REDDIT_PASSWORD}"
+  user_agent: "SENTRX-Q/0.1.0 (by u/your_bot_account)"
+  # Subreddits to monitor.
+  # "sentrx_q_dev" is the official playtest environment:
+  # https://www.reddit.com/r/sentrx_q_dev/?playtest=sentrx-q
+  subreddits:
+    - "sentrx_q_dev"
+  # Maximum number of items to fetch per poll cycle.
+  fetch_limit: 100
+
+openai:
+  # OpenAI API key — override via OPENAI_API_KEY environment variable.
+  api_key: "${OPENAI_API_KEY}"
+  model: "gpt-4"
+  # Maximum tokens for each triage response.
+  max_tokens: 512
+  # Temperature for the completion request (0 = deterministic).
+  temperature: 0.2
+
+triage:
+  # Confidence threshold (0–1) above which auto-actions may fire.
+  confidence_threshold: 0.85
+  # Enable automatic removal / approval based on AI recommendation.
+  # **KEEP FALSE** until you have validated the bot on your subreddit.
+  auto_actions: false
+  # Categories that trigger an immediate escalation alert.
+  escalation_categories:
+    - "threat"
+    - "self_harm"
+    - "csam"
+
+database:
+  # Path to the SQLite file used for audit logging.
+  path: "sentrx_q.db"
+
+dashboard:
+  # Host and port for the Flask web dashboard.
+  host: "127.0.0.1"
+  port: 5000
+  # Set to a random secret for session security.
+  secret_key: "${DASHBOARD_SECRET_KEY:-change_me_in_production}"
+  # Number of queue items shown per page.
+  page_size: 25
+
+logging:
+  level: "INFO"
+  file: "sentrx_q.log"
