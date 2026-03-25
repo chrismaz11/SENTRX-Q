@@ -18,6 +18,11 @@ CFG = {
         "page_size": 10,
     },
     "triage": {"auto_actions": False},
+    "tier": {
+        "features": {
+            "api_access": True,
+        }
+    },
 }
 
 
@@ -119,3 +124,32 @@ def test_index_empty_queue():
         resp = c.get("/")
         assert resp.status_code == 200
         assert b"No items" in resp.data
+
+
+def test_api_queue_forbidden_without_feature():
+    """API endpoints return 403 when api_access tier feature is disabled."""
+    cfg_no_api = {
+        "dashboard": {"secret_key": "test-secret", "page_size": 10},
+        "triage": {"auto_actions": False},
+    }
+    audit = _mock_audit()
+    app = create_app(cfg_no_api, audit=audit)
+    app.config["TESTING"] = True
+    with app.test_client() as c:
+        resp = c.get("/api/queue")
+        assert resp.status_code == 403
+        assert b"free tier" in resp.data.lower()
+
+
+def test_api_stats_forbidden_without_feature():
+    """API stats endpoint returns 403 when api_access tier feature is disabled."""
+    cfg_no_api = {
+        "dashboard": {"secret_key": "test-secret", "page_size": 10},
+        "triage": {"auto_actions": False},
+    }
+    audit = _mock_audit()
+    app = create_app(cfg_no_api, audit=audit)
+    app.config["TESTING"] = True
+    with app.test_client() as c:
+        resp = c.get("/api/stats")
+        assert resp.status_code == 403

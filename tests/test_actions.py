@@ -25,7 +25,12 @@ CFG_AUTO_ON = {
     "triage": {
         "auto_actions": True,
         "confidence_threshold": 0.85,
-    }
+    },
+    "tier": {
+        "features": {
+            "auto_actions": True,
+        }
+    },
 }
 
 
@@ -123,3 +128,20 @@ def test_reddit_error_is_caught():
     runner = ActionRunner(reddit, audit, CFG_AUTO_ON)
     outcome = runner.process(_item(), _result(action="remove", confidence=0.92))
     assert "error" in outcome
+
+
+def test_tier_flag_blocks_auto_actions():
+    """auto_actions must be False when the tier feature flag is not set."""
+    cfg_no_tier = {
+        "triage": {
+            "auto_actions": True,
+            "confidence_threshold": 0.85,
+        }
+        # no "tier" key — tier feature defaults to False
+    }
+    reddit = MagicMock()
+    audit = MagicMock()
+    runner = ActionRunner(reddit, audit, cfg_no_tier)
+    outcome = runner.process(_item(), _result(action="remove", confidence=0.95))
+    assert outcome == "queued"
+    reddit.remove.assert_not_called()
