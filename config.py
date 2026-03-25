@@ -47,6 +47,28 @@ def _walk(obj: Any) -> Any:
     return obj
 
 
+def is_feature_enabled(cfg: dict[str, Any], feature_name: str) -> bool:
+    """Return whether *feature_name* is enabled in the tier features dict.
+
+    Parameters
+    ----------
+    cfg:
+        Configuration dictionary as returned by :func:`load_config`.
+    feature_name:
+        The feature key to look up, e.g. ``"ai_triage"`` or ``"dashboard"``.
+
+    Returns
+    -------
+    bool
+        ``True`` if the feature is enabled, ``False`` otherwise (including if
+        the key does not exist in the config).
+    """
+    try:
+        return bool(cfg["tier"]["features"][feature_name])
+    except (KeyError, TypeError):
+        return False
+
+
 def load_config(path: str | Path | None = None) -> dict[str, Any]:
     """Load and return the SENTRX-Q configuration dictionary.
 
