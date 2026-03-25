@@ -53,3 +53,15 @@ dashboard:
 logging:
   level: "INFO"
   file: "sentrx_q.log"
+
+tier:
+  plan: "free"  # "free" | "pro" | "enterprise"
+  features:
+    ai_triage: false       # GPT-4 triage (pro+)
+    heuristic_triage: true  # keyword fallback (all tiers)
+    dashboard: true         # web dashboard (all tiers)
+    auto_actions: false     # automated mod actions (pro+)
+    api_access: false       # JSON API endpoints (pro+)
+    multi_subreddit: false  # monitor multiple subs (enterprise)
+    custom_rules: false     # custom keyword rules (enterprise)
+    priority_support: false # priority support (enterprise)

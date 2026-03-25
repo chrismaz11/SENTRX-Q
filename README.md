@@ -175,6 +175,30 @@ SENTRX-Q/
 
 ---
 
+## 💰 Support
+
+If SENTRX-Q saves you hours of manual mod-queue review, consider supporting the project:
+
+- ❤️ **[GitHub Sponsors](https://github.com/sponsors/chrismaz11)** — one-time or recurring support
+- ☕ Ko-fi, Buy Me a Coffee, and Patreon links coming soon
+
+Your support helps fund API costs, new features, and keeping the hosted version free for small subreddits.
+
+---
+
+## 🏷️ Tiers
+
+| Tier | Price | Features |
+|------|-------|----------|
+| **Free** | Self-host, free forever | Heuristic triage + web dashboard |
+| **Pro** *(coming soon)* | TBD | AI triage (GPT-4), auto-actions, JSON API access |
+| **Enterprise** *(coming soon)* | TBD | Everything in Pro + multi-subreddit, custom rules, priority support |
+
+The free tier is fully functional for most small-to-medium subreddits.
+Feature flags live in `config/default.yml` under the `tier:` key.
+
+---
+
 ## 📄 License
 
 MIT © chrismaz11
