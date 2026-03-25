@@ -138,7 +138,7 @@ def test_api_queue_forbidden_without_feature():
     with app.test_client() as c:
         resp = c.get("/api/queue")
         assert resp.status_code == 403
-        assert b"free tier" in resp.data.lower()
+        assert b"API access is not available on the free tier." in resp.data
 
 
 def test_api_stats_forbidden_without_feature():
@@ -153,3 +153,4 @@ def test_api_stats_forbidden_without_feature():
     with app.test_client() as c:
         resp = c.get("/api/stats")
         assert resp.status_code == 403
+        assert b"API access is not available on the free tier." in resp.data

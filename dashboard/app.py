@@ -96,7 +96,8 @@ def create_app(cfg: dict[str, Any], audit=None, reddit=None) -> Flask:
     @app.route("/api/queue")
     def api_queue():
         if not is_feature_enabled(cfg, "api_access"):
-            return jsonify({"error": "API access is not available on the free tier. Upgrade to Pro or Enterprise."}), 403
+            msg = "API access is not available on the free tier. Upgrade to Pro or Enterprise."
+            return jsonify({"error": msg}), 403
         audit_log = app.config.get("AUDIT")
         items = audit_log.recent_triage_results(100) if audit_log else []
         return jsonify({"items": items})
@@ -104,7 +105,8 @@ def create_app(cfg: dict[str, Any], audit=None, reddit=None) -> Flask:
     @app.route("/api/stats")
     def api_stats():
         if not is_feature_enabled(cfg, "api_access"):
-            return jsonify({"error": "API access is not available on the free tier. Upgrade to Pro or Enterprise."}), 403
+            msg = "API access is not available on the free tier. Upgrade to Pro or Enterprise."
+            return jsonify({"error": msg}), 403
         audit_log = app.config.get("AUDIT")
         data = audit_log.stats() if audit_log else {}
         return jsonify(data)
