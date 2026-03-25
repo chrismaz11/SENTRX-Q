@@ -17,6 +17,8 @@ from typing import Any
 
 from flask import Flask, jsonify, redirect, render_template, request, url_for
 
+from config import is_feature_enabled
+
 logger = logging.getLogger(__name__)
 
 _SEVERITY_ORDER = {"critical": 0, "high": 1, "medium": 2, "low": 3}
@@ -88,17 +90,23 @@ def create_app(cfg: dict[str, Any], audit=None, reddit=None) -> Flask:
         return redirect(url_for("index"))
 
     # ------------------------------------------------------------------
-    # JSON API
+    # JSON API (requires api_access tier feature)
     # ------------------------------------------------------------------
 
     @app.route("/api/queue")
     def api_queue():
+        if not is_feature_enabled(cfg, "api_access"):
+            msg = "API access is not available on the free tier. Upgrade to Pro or Enterprise."
+            return jsonify({"error": msg}), 403
         audit_log = app.config.get("AUDIT")
         items = audit_log.recent_triage_results(100) if audit_log else []
         return jsonify({"items": items})
 
     @app.route("/api/stats")
     def api_stats():
+        if not is_feature_enabled(cfg, "api_access"):
+            msg = "API access is not available on the free tier. Upgrade to Pro or Enterprise."
+            return jsonify({"error": msg}), 403
         audit_log = app.config.get("AUDIT")
         data = audit_log.stats() if audit_log else {}
         return jsonify(data)

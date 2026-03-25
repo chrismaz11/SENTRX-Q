@@ -14,6 +14,7 @@ from typing import Any
 
 from bot.ai_triage import TriageResult
 from bot.reddit_client import ModQueueItem, RedditClient
+from config import is_feature_enabled
 from database.models import AuditLog
 
 logger = logging.getLogger(__name__)
@@ -31,7 +32,9 @@ class ActionRunner:
         triage_cfg = cfg.get("triage", {})
         self._reddit = reddit
         self._audit = audit
-        self._auto_actions: bool = bool(triage_cfg.get("auto_actions", False))
+        # auto_actions requires both the tier feature flag AND the operational toggle.
+        tier_allows = is_feature_enabled(cfg, "auto_actions")
+        self._auto_actions: bool = tier_allows and bool(triage_cfg.get("auto_actions", False))
         self._confidence_threshold: float = float(triage_cfg.get("confidence_threshold", 0.85))
 
     # ------------------------------------------------------------------

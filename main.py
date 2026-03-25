@@ -19,7 +19,7 @@ import logging
 import sys
 import time
 
-from config import load_config
+from config import is_feature_enabled, load_config
 
 
 def _setup_logging(cfg: dict) -> None:
@@ -34,28 +34,42 @@ def _setup_logging(cfg: dict) -> None:
 
 def cmd_triage(cfg: dict, once: bool = False) -> None:
     """Fetch the mod queue and triage every item."""
-    import openai
-
     from bot.actions import ActionRunner
-    from bot.ai_triage import AITriageEngine
     from bot.heuristics import triage_heuristic
     from bot.reddit_client import RedditClient
     from database.models import AuditLog
 
+    ai_triage_enabled = is_feature_enabled(cfg, "ai_triage")
+
     reddit = RedditClient(cfg)
     audit = AuditLog(cfg)
-    ai_engine = AITriageEngine(cfg)
     runner = ActionRunner(reddit, audit, cfg)
+
+    if ai_triage_enabled:
+        import openai
+
+        from bot.ai_triage import AITriageEngine
+
+        ai_engine = AITriageEngine(cfg)
+        logging.info("AI triage enabled (model=%s).", cfg.get("openai", {}).get("model", "gpt-4"))
+    else:
+        logging.info("AI triage disabled for this tier — using heuristics only.")
 
     poll_interval = 60  # seconds between passes
     while True:
         logging.info("Fetching mod queue…")
         items = reddit.fetch_mod_queue()
         for item in items:
-            try:
-                result = ai_engine.triage(item)
-            except (openai.OpenAIError, Exception):
-                logging.warning("AI unavailable for %s, falling back to heuristics.", item.item_id)
+            if ai_triage_enabled:
+                try:
+                    result = ai_engine.triage(item)
+                except openai.OpenAIError as exc:
+                    logging.warning("OpenAI error for %s (%s), falling back to heuristics.", item.item_id, exc)
+                    result = triage_heuristic(item, cfg=cfg)
+                except Exception as exc:
+                    logging.warning("AI unavailable for %s (%s), falling back to heuristics.", item.item_id, exc)
+                    result = triage_heuristic(item, cfg=cfg)
+            else:
                 result = triage_heuristic(item, cfg=cfg)
             outcome = runner.process(item, result)
             logging.info(
