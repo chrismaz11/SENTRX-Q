@@ -79,6 +79,30 @@ DASHBOARD_SECRET_KEY=change_me_in_production
 > **Reddit API credentials** — create an app at
 > <https://www.reddit.com/prefs/apps> (choose *script* type).
 
+### Auto-detect Reddit credentials (optional)
+
+If you're not sure where to find your Reddit API client ID and secret,
+run the helper script:
+
+```bash
+pip install playwright
+playwright install chromium
+python scripts/fetch_reddit_credentials.py
+```
+
+The script will open a browser, log you in, navigate to the Reddit apps
+page, and extract/display your credentials.  It will also offer to write
+them directly into your `.env` file.
+
+```
+# Optional flags
+python scripts/fetch_reddit_credentials.py --headless   # no visible window
+python scripts/fetch_reddit_credentials.py --username YOUR_NAME
+```
+
+> ⚠️  If Reddit shows a CAPTCHA or 2FA prompt during login, complete it
+> manually in the browser — the script will pause and wait for you.
+
 ### 3. Start the playtest environment
 
 The official playtest subreddit is
@@ -154,6 +178,8 @@ SENTRX-Q/
 │   └── models.py          # SQLAlchemy models + AuditLog
 ├── config/
 │   └── default.yml        # YAML config (safe defaults)
+├── scripts/
+│   └── fetch_reddit_credentials.py  # Playwright helper — auto-fetch API creds
 ├── tests/                 # pytest suite (all mocked)
 ├── .github/workflows/
 │   └── ci.yml             # GitHub Actions CI
